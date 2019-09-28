@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-# Create your models here.
+#ここから無視↓
 class Post(models.Model):
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
@@ -18,3 +18,19 @@ class Post(models.Model):
     def _str_(self):
         return self.title
 
+#ここまで↑
+
+class Meeting(models.Model):
+    #PEOPLE_CHOICE = (
+    #('2','2人'),
+    #('3','3人'),
+    #('4','4人'),
+    #('5','5人'),
+    #)
+    #people = models.CharField(max_length=20)
+    destination = models.IntegerField()
+    #landmark = models.CharField(max_length=30)
+    #exitmark = models.CharField(max_length=30)
+
+    def _str_(self):
+        return self.people
