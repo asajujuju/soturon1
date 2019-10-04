@@ -1,0 +1,20 @@
+<!--
+    地図上に最適な目的地、周辺情報を表示するページ
+-->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<p>
+  <a href="{% url 'add_route' group.pk %}">追加</a>
+</p>
+<p>
+  グループ番号: {{ group.number }}<br>
+  目的地: {{ group.landmark }}<br>
+</p>
+
+<p>
+  {% for route in routes %}
+    {{ route.route }}, {{ route.hour }}時{{ route.minute }}分<br>
+  {% endfor %}
+</p>
+{% endblock %}
