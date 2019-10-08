@@ -31,7 +31,7 @@ class Name(models.Model):
 #
 #↓ここからダンジョンで使う
 #
-    
+
 #新宿駅周辺のカフェ、レストランの情報
 class Cafe(models.Model):
     name = models.CharField(max_length=50)
@@ -49,12 +49,23 @@ class Cafe(models.Model):
    landmark (char) : ランドマーク(目的地)情報
    exitmark (char) : 出口(目的地)情報
 """
+NumberOfPeople = ((1,1),(2,2),(3,3),(4,4),(5,5),)
+
+Landmark = (('都庁','都庁'),)
+
+Exit = (('出口1','出口１'),)
+
+
 class Group(models.Model):
     number = models.CharField(max_length=100)
-    people = models.IntegerField()
-    destination = models.CharField(max_length=10)
-    landmark = models.CharField(max_length=20)
-    exitmark = models.CharField(max_length=20)
+    #people = models.IntegerField()
+    people = models.ChoiceField(lavel='人数', widget=forms.Select, choices=NumberOfPeople, required=True,)
+    #destination = models.CharField(max_length=10)
+    destination = models.CharField(widget=forms.Select,)
+    #landmark = models.CharField(max_length=20)
+    landmark = models.ChoiceField(lavel='ランドマーク', widget=forms.Select, choices=Landmark, required=True,)
+    #exitmark = models.CharField(max_length=20)
+    exitmark = models.ChoiceField(lavel='出口', widget=forms.Select, choices=Exit, required=True,)
 
     def __str__(self):
         return self.number
