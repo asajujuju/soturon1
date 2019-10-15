@@ -74,7 +74,7 @@ def select(request):
 def map(request, pk):
     group = get_object_or_404(Group, pk=pk)
     routes = Route.objects.filter(number=pk)
-    return render(request, 'blog/map.html', {'group': group, 'routes': routes,})
+    return render(request, 'blog/map.html', {'group': group, 'routes': routes})
 
 def add_route(request, pk):
     group = get_object_or_404(Group, pk=pk)
