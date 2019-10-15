@@ -1,0 +1,8 @@
+<!--
+各個人の路線・到着時刻を追加するページ
+-->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<a href="{% url 'select' %}">待ち合わせ</a>
+{% endblock %}
