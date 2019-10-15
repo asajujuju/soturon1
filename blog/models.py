@@ -50,7 +50,7 @@ class Cafe(models.Model):
    exitmark (char) : 出口(目的地)情報
 """
 
-NumberOfPeople = ((1,1),(2,2),(3,3),(4,4),(5,5),)
+NumberOfPeople = ((2,2),(3,3),(4,4),(5,5),)
 DESTINATION = (('あり','あり'),('なし','なし'),)
 Landmark = (('都庁','都庁'),('新宿ピカデリー','新宿ピカデリー'),)
 Exit = (('出口1','出口１'),)
