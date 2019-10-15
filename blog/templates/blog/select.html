@@ -1,0 +1,14 @@
+<!--
+待ち合わせ情報の入力ページ
+・目的地の有無の指定
+・目的地となるランドマークか出口の設定
+・人数の指定(2~5人)
+-->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<form method="POST" class="post-form">{% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="save btn btn-default">Save</button>
+</form>
+{% endblock %}
