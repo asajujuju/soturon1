@@ -1,5 +1,6 @@
 from django import forms
 from .models import Post, Name, Group, Route
+<<<<<<< HEAD
 
 NumberOfPeople = ((1,1),(2,2),(3,3),(4,4),(5,5),)
 
@@ -8,6 +9,8 @@ DESTINATION = (('あり','あり'),('なし','なし'),)
 Landmark = (('都庁','都庁'),)
 
 Exit = (('出口1','出口１'),)
+=======
+>>>>>>> a6bae45502422a2c667d5a4d7721f7e867343295
 
 class PostForm(forms.ModelForm):
 
@@ -27,6 +30,7 @@ class GroupForm(forms.ModelForm):
         model = Group
         fields = ('number', 'people', 'destination', 'landmark', 'exitmark',)
 
+<<<<<<< HEAD
 """
         number = forms.CharField(
         label='グループ番号',
@@ -62,6 +66,8 @@ class GroupForm(forms.ModelForm):
         #fields = ('number', 'people', 'destination', 'landmark', 'exitmark',)
 
 
+=======
+>>>>>>> a6bae45502422a2c667d5a4d7721f7e867343295
 class RouteForm(forms.ModelForm):
 
     class Meta:
