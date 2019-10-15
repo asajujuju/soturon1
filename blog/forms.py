@@ -1,6 +1,5 @@
 from django import forms
 from .models import Post, Name, Group, Route
-<<<<<<< HEAD
 
 NumberOfPeople = ((1,1),(2,2),(3,3),(4,4),(5,5),)
 
