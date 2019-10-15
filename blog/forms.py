@@ -27,40 +27,6 @@ class GroupForm(forms.ModelForm):
         model = Group
         fields = ('number', 'people', 'destination', 'landmark', 'exitmark',)
 
-"""
-        number = forms.CharField(
-        label='グループ番号',
-        max_length=100,
-        required=True,
-        )
-
-        people = forms.IntegerField(
-        label='人数',
-        required=True,
-        )
-
-        destination = forms.ChoiceField(
-        label='目的地',
-        widget=forms.Select,
-        choices=DESTINATION,
-        required=True,
-        )
-
-        landmark = forms.CharField(
-        label='ランドマーク',
-        max_length=50,
-        required=True,
-        )
-
-        exitmark = forms.CharField(
-        label='出口',
-        required=True,
-        )
-"""
-    #class Meta:
-        #model = Group
-        #fields = ('number', 'people', 'destination', 'landmark', 'exitmark',)
-
 class RouteForm(forms.ModelForm):
 
     class Meta:
