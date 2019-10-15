@@ -49,7 +49,6 @@ class Cafe(models.Model):
    landmark (char) : ランドマーク(目的地)情報
    exitmark (char) : 出口(目的地)情報
 """
-<<<<<<< HEAD
 
 NumberOfPeople = ((1,1),(2,2),(3,3),(4,4),(5,5),)
 DESTINATION = (('あり','あり'),('なし','なし'),)
@@ -63,13 +62,6 @@ class Group(models.Model):
     destination = models.CharField(max_length=10,choices=DESTINATION)
     landmark = models.CharField(max_length=20,choices=Landmark,blank=True)
     exitmark = models.CharField(max_length=20,choices=Exit,blank=True)
-=======
-NumberOfPeople = ((1,1),(2,2),(3,3),(4,4),(5,5),)
-
-Landmark = (('都庁','都庁'),)
-
-Exit = (('出口1','出口１'),)
-
 
 class Group(models.Model):
     number = models.CharField(max_length=100)
@@ -81,7 +73,6 @@ class Group(models.Model):
     landmark = models.ChoiceField(lavel='ランドマーク', widget=forms.Select, choices=Landmark, required=True,)
     #exitmark = models.CharField(max_length=20)
     exitmark = models.ChoiceField(lavel='出口', widget=forms.Select, choices=Exit, required=True,)
->>>>>>> a6bae45502422a2c667d5a4d7721f7e867343295
 
     def __str__(self):
         return self.number
@@ -95,11 +86,7 @@ class Group(models.Model):
 """
 class Route(models.Model):
     number = models.CharField(max_length=100)
-<<<<<<< HEAD
     route = models.CharField(max_length=20,choices=Route)
-=======
-    route = models.CharField(max_length=20)
->>>>>>> a6bae45502422a2c667d5a4d7721f7e867343295
     hour = models.CharField(max_length=5)
     minute = models.CharField(max_length=5)
 
