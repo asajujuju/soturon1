@@ -63,17 +63,6 @@ class Group(models.Model):
     landmark = models.CharField(max_length=20,choices=Landmark,blank=True)
     exitmark = models.CharField(max_length=20,choices=Exit,blank=True)
 
-class Group(models.Model):
-    number = models.CharField(max_length=100)
-    #people = models.IntegerField()
-    people = models.ChoiceField(lavel='人数', widget=forms.Select, choices=NumberOfPeople, required=True,)
-    #destination = models.CharField(max_length=10)
-    destination = models.CharField(widget=forms.Select,)
-    #landmark = models.CharField(max_length=20)
-    landmark = models.ChoiceField(lavel='ランドマーク', widget=forms.Select, choices=Landmark, required=True,)
-    #exitmark = models.CharField(max_length=20)
-    exitmark = models.ChoiceField(lavel='出口', widget=forms.Select, choices=Exit, required=True,)
-
     def __str__(self):
         return self.number
 
