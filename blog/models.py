@@ -1,37 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-#チュートリアル用のデータベース
-#後で削除する
-class Post(models.Model):
-    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    text = models.TextField()
-    created_date = models.DateTimeField(
-            default=timezone.now)
-    published_date = models.DateTimeField(
-            blank=True, null=True)
-
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
-
-    def __str__(self):
-        return self.title
-
-
-#formとmodelの接続テスト用
-class Name(models.Model):
-    number = models.CharField(max_length=10)
-    name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.name
-
-#
-#↓ここからダンジョンで使う
-#
-
 #新宿駅周辺のカフェ、レストランの情報
 class Cafe(models.Model):
     name = models.CharField(max_length=50)
@@ -52,9 +21,9 @@ class Cafe(models.Model):
 
 NumberOfPeople = ((2,2),(3,3),(4,4),(5,5),)
 DESTINATION = (('あり','あり'),('なし','なし'),)
-Landmark = (('都庁','都庁'),('新宿ピカデリー','新宿ピカデリー'),)
-Exit = (('出口1','出口１'),)
-Route = (('中央線','中央線'),('山の手線','山の手線'),('西武新宿線','西武新宿線'),)
+Landmark = (('100','都庁'),('200','新宿ピカデリー'),)
+Exit = (('300','出口１'),)
+Route = (('1','小田急小田原線'),('2','都営新宿線'),('3','東京メトロ丸ノ内線'),('4','JR中央線'),('5','JR埼京線'),('6','JR総務線'),('7','JR山の手線(外回り)'),('8','JR山の手線(内回り)'),('9','JR湘南新宿ライン'),('10','京王線'),('11','京王新線'),('12','西武新宿線'),)
 
 class Group(models.Model):
     number = models.CharField(max_length=100)
@@ -76,8 +45,8 @@ class Group(models.Model):
 class Route(models.Model):
     number = models.CharField(max_length=100)
     route = models.CharField(max_length=20,choices=Route)
-    hour = models.CharField(max_length=5)
-    minute = models.CharField(max_length=5)
+    hour = models.CharField(max_length=10)
+    minute = models.CharField(max_length=10)
 
     def __str__(self):
         return self.number
