@@ -1,20 +1,64 @@
 <!--
     地図上に最適な目的地、周辺情報を表示するページ
--->
+  -->
 {% extends 'blog/base.html' %}
 
 {% block content %}
 <p>
   <a href="{% url 'add_route' group.pk %}">追加</a>
 </p>
+
 <p>
-  グループ番号: {{ group.number }}<br>
+  グループ番号: {{ group.pk }}<br>
   目的地: {{ group.landmark }}<br>
+  最適な待ち合わせ場所： {{ meet }}<br>
 </p>
 
 <p>
   {% for route in routes %}
-    {{ route.route }}, {{ route.hour }}時{{ route.minute }}分<br>
+  {{ route.route }}<br>
   {% endfor %}
 </p>
+
+<div id="mapcontainer" style="width:600px;height:600px"></div>
+<script>
+  var map = L.map('mapcontainer');
+  map.setView([35.689761, 139.700523], 17);
+
+  var marker = L.marker([35.689761, 139.700523]).addTo(map);
+  marker.bindPopup("新宿駅");
+
+  var redIcon = L.icon({
+    iconUrl: '../../static/img/marker-icon-red.png',
+    iconRetinaUrl: '../../static/img/marker-icon-red-2x.png',
+  });
+  var greenIcon = L.icon({
+    iconUrl: '../../static/img/marker-icon-green.png',
+    iconRetinaUrl: '../../static/img/marker-icon-green-2x.png',
+  });
+
+  var markerList = [
+  { pos: [35.690690, 139.700273], name: "中央線" },
+  { pos: [35.691761, 139.700523], name: "埼京線" },
+  { pos: [35.692761, 139.700523], name: "山手線" },
+  { pos: [35.688761, 139.700723], name: "京王線" },
+  { pos: [35.689761, 139.700273], name: "都営新宿線" },
+  ];
+  var i = 0;
+
+
+  {% for cafe in cafes %}
+  //markerList.push({pos: [{{ cafe.latitude }}, {{ cafe.longitude }}], name: {{ cafe.name }});
+  L.marker([{{ cafe.latitude }}, {{ cafe.longitude }}], {icon: greenIcon}, {title: "cafe" }).bindPopup("cafe").addTo(map);
+  {% endfor %}
+
+  {% for route in routes %}
+  L.marker(markerList[i].pos, {icon: redIcon}, {title: markerList[i].name}).bindPopup(markerList[i].name).addTo(map);
+  i = i+1;
+  {% endfor %}
+
+  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+  attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
+  }).addTo(map);
+</script>
 {% endblock %}
