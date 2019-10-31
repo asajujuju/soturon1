@@ -1,6 +1,6 @@
 import requests
 import json
-from blog.models import Cafe
+#from blog.models import Cafe
 
 # APIキーの指定
 apikey = "720080a2660c9bab99f283596cb1d67f"
@@ -21,8 +21,11 @@ data = json.loads(r.text)
 hit = data["hit_per_page"]
 
 for i in range(0,hit):
- Cafe.objects.create(name=data["rest"][i]["name"], latitude=data["rest"][i]["latitude"], longitude=data["rest"][i]["longitude"])
- 
+    if data["rest"][i]["latitude"] == "":
+        continue
+    #print(data["rest"][i]["name"])
+    Cafe.objects.create(name=data["rest"][i]["name"], latitude=data["rest"][i]["latitude"], longitude=data["rest"][i]["longitude"])
+
 #print(data["rest"][0]["latitude"])
 #print(data["rest"][0]["longitude"])
 #print(data["rest"][i]["name"]+" "+data["rest"][i]["latitude"]+" "+data["rest"][i]["longitude"])
