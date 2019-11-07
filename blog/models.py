@@ -18,9 +18,9 @@ class Cafe(models.Model):
    landmark (char) : ランドマーク(目的地)情報
    exitmark (char) : 出口(目的地)情報
 """
-def FileRead():
+def FileRead(t):
     #ファイルを読み込む
-    file_data = open("exit.txt", "r")
+    file_data = open(t, "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
     exit = []
@@ -38,7 +38,8 @@ DESTINATION = ((True,'あり'),(False,'なし'),)
 Landmark = ((-1,'-------'),(100,'都庁'),(200,'新宿ピカデリー'),)
 Route = ((1,'小田急小田原線'),(2,'都営新宿線'),(3,'東京メトロ丸ノ内線'),(4,'JR中央線'),(5,'JR埼京線'),(6,'JR総務線'),(7,'JR山の手線(外回り)'),(8,'JR山の手線(内回り)'),(9,'JR湘南新宿ライン'),(10,'京王線'),(11,'京王新線'),(0,'西武新宿線'),)
 
-#Exit = FileRead()
+#Exit = FileRead("exit.txt");
+#Landmark = FileRead("landmark.txt");
 Exit = ((1,'出口１'),)
 
 class Group(models.Model):
