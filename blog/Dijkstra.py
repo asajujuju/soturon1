@@ -3,52 +3,136 @@ import numpy as np
 
 """
    目的地がありの時の最短経路検索
-       num: 待ち合わせする人の数
-       member: 待ち合わせする人のノード番号を保持した配列
-       goal: 目的地のノード番号
+       src: それぞれの路線のノード番号を保持した配列
+       dst: 目的地のノード番号
+       dest: 目的地の有無
 """
 
 """
    待ち合わせ場所の解を返すメソッド
 """
 def answer(route_map, nTown, src, dst, dest):
-    if dest==True: #目的地があるとき
-        dis1, via1 = solve(route_map, nTown, src[0], dst)
-        dis2, via2 = solve(route_map, nTown, src[1], dst)
-        print(dis1)
-        print(getPath(dst,via1))
-        print(dis2)
-        print(getPath(dst,via2))
-        if dis1<dis2:
-            via_kari = getPath(dst, via1)
-            dist = sys.maxsize
-            for i in range(len(via_kari)):
-                d, v = solve(route_map, nTown, src[1], via_kari[i])
-                if d<dist:
-                    dist = d
-                    meet = via_kari[i]
-            return meet
-        else:
-            via = getPath(dst, via1)
-            dist = sys.maxsize
-            for i in range(len(via)):
-                d, v = solve(route_map, nTown, src[0], via[i])
-                if d<dist:
-                    final_d = d
-                    meet = v[i]
-            return meet
-    else: #目的地なし
-        dis1, via1 = solve(route_map, nTown, src[0], src[1])
-        path = getPath(src[1],via1)
-        print(path)
-        half = int(len(path)/2)
-        meet = path[half]
-        return meet
-            
-        
-                    
+    num = len(src) #待ち合わせをする人数
+    dis = np.zeros(num)
+    via = []
+    #待ち合わせの人数分の目的地への最短経路を保持
+    for n in range(num):
+        d, v = solve(route_map, nTown, src[n], dst)
+        dis[n] = d
+        via.append(v)
+    if len(dis)==2:
+        return two(route_map, nTown, src, dst, dest, dis, via)
+    if len(dis)==3:
+        return three(route_map, nTown, src, dst, dest, dis, via)
 
-  
+"""
+   待ち合わせ人数が3人の時
+"""
+def three(route_map, nTown, src, dst, dest, dis, via):
+    meet = []
+    if dest==True: #目的地があるとき
+        print(dis[0])
+        print(getPath(dst,via[0]))
+        print(dis[1])
+        print(getPath(dst,via[1]))
+        print(dis[2])
+        print(getPath(dst,via[2]))
+        if dis[0]<dis[1]:
+            if dis[0]<dis[2]:
+                m = meetDist(route_map, nTown, src[2], dst, via[0])
+                meet.append(m)
+                m = meetDist(route_map, nTown, src[1], dst, via[0])
+                meet.append(m)
+                return meet
+            else:
+                m = meetDist(route_map, nTown, src[0], dst, via[2])
+                meet.append(m)
+                m = meetDist(route_map, nTown, src[1], dst, via[2])
+                meet.append(m)
+                return meet
+        else:
+            if dis[1]<dis[2]:
+                m = meetDist(route_map, nTown, src[0], dst, via[1])
+                meet.append(m)
+                m = meetDist(route_map, nTown, src[2], dst, via[1])
+                meet.append(m)
+                return meet
+            else:
+                m = meetDist(route_map, nTown, src[0], dst, via[2])
+                meet.append(m)
+                m = meetDist(route_map, nTown, src[1], dst, via[2])
+                meet.append(m)
+                return meet
+    else: #目的地なし
+        d0, v0 = solve(route_map, nTown, src[0], src[1])
+        d1, v1 = solve(route_map, nTown, src[0], src[2])
+        d2, v2 = solve(route_map, nTown, src[1], src[2])
+        print(getPath(src[1],v0))
+        print(getPath(src[2],v1))
+        print(getPath(src[2],v2))
+        if d0<d1:
+            if d0<d2:
+                meet = meetDist(route_map, nTown, src[2], src[1], v0)
+                return meet
+            else:
+                meet = meetDist(route_map, nTown, src[0], src[2], v2)
+                return meet
+        else:
+            if d1<d2:
+                meet = meetDist(route_map, nTown, src[1], src[2], v1)
+                return meet
+            else:
+                meet = meetDist(route_map, nTown, src[0], src[2], v2)
+                return meet
+
+
+"""
+   待ち合わせ人数が2人の時
+"""
+def two(route_map, nTown, src, dst, dest, dis, via):
+    if dest==True: #目的地があるとき
+        print(dis[0])
+        print(getPath(dst,via[0]))
+        print(dis[1])
+        print(getPath(dst,via[1]))
+        if dis[0]<dis[1]:
+            return meetDist(route_map, nTown, src[1], dst, via[0])
+        else:
+            return meetDist(route_map, nTown, src[0], dst, via[1])
+    else: #目的地なし
+        return meet(route_map, nTown, src)
+
+"""
+   目的地ありの時
+   最短距離で出会うノードを探索するメソッド
+"""
+def meetDist(route_map, nTown, src, dst, via):
+    via_kari = getPath(dst,via)
+    dist = sys.maxsize
+    for i in range(len(via_kari)):
+        d, v = solve(route_map, nTown, src, via_kari[i])
+        if d<dist:
+            dist = d
+            meet = via_kari[i]
+    return meet
+
+"""
+   目的地なしの時
+   最短距離で出会うノードを探索するメソッド
+"""
+def meet(route_map, nTown, src):
+    dis, via = solve(route_map, nTown, src[0], src[1])
+    path = getPath(src[1],via)
+    print(path)
+    half = 0
+    node = path[0]
+    for i in range(len(path)-1):
+        if half<dis/2:
+            half = half + route_map[path[i]][path[i+1]]
+            node = i+1
+    meet = path[node]
+    return meet
+
 """
    最短経路探索を行うメソッド
 """
@@ -59,7 +143,7 @@ def solve(route_map, nTown, src, dst):
     fixed = [False]*nTown #最短距離が確定していない
     via = [-1]*nTown #その都市へ最短経路で到達する直前の都市
     distance[src] = 0 #出発地点までの距離を0とする
-    
+
     #未確定の中での最も近い都市を求める
     while True:
         marked = minIndex(distance, fixed, nTown)

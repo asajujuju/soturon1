@@ -20,10 +20,25 @@ class Cafe(models.Model):
    exitmark (char) : 出口(目的地)情報
 """
 
+def FileRead(t):
+    #ファイルを読み込む
+    file_data = open(t, "r")
+    firstline = True
+    #読み込んだファイルを1行ずつ表示
+    exit = []
+    for line in file_data:
+        data = line.split(' ')#空白文字で区切る
+        userval = str(data[0])#データベースに入れる値
+        dbval = int(data[1])#ユーザーが見る値
+        exit.append([dbval, userval])#出口
+    #開いたファイルを閉じる
+    file_data.close()
+    return(exit)
+
 NumberOfPeople = ((2,2),(3,3),(4,4),(5,5),)
 DESTINATION = ((True,'あり'),(False,'なし'),)
-Landmark = ((-1,'-------'),(100,'都庁'),(200,'新宿ピカデリー'),)
-Exit = ((-1,'-------'),(300,'出口１'),)
+Exit = FileRead("exit.txt");
+Landmark = FileRead("landmark.txt");
 
 class Group(models.Model):
     people = models.IntegerField(choices=NumberOfPeople)
@@ -42,8 +57,7 @@ class Group(models.Model):
    minute (char) : 到着分
 """
 
-Route = ((1,'小田急小田原線'),(2,'都営新宿線'),(3,'東京メトロ丸ノ内線'),(4,'JR中央線'),(5,'JR埼京線'),(6,'JR総務線'),(7,'JR山の手線(外回り)'),(8,'JR山の手線(内回り)'),(9,'JR湘南新宿ライン'),(10,'京王線'),(11,'京王新線'),(12,'西武新宿線'),)
-
+Route = FileRead("route.txt");
 class Route(models.Model):
     number = models.CharField(max_length=100)
     route = models.IntegerField(choices=Route)
