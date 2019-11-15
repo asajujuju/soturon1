@@ -9,7 +9,7 @@ from .Dijkstra_t3 import answer
 def FileRead():
     #ファイルを読み込む
     #file_data = open("nanana3.pythonanywhere.com/shinjukuroute.txt", "r")
-    file_data = open("blog/static/text/shinjukuroute.txt", "r")
+    file_data = open("shinjukuroute.txt", "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
     for line in file_data:
