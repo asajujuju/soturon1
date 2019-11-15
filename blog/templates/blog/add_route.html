@@ -1,0 +1,12 @@
+<!--
+各個人の路線・到着時刻を追加するページ
+
+-->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<form method="POST" class="post-form">{% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="save btn btn-default">Save</button>
+</form>
+{% endblock %}

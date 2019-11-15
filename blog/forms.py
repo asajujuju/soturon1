@@ -1,9 +1,14 @@
 from django import forms
+from .models import Group, Route
 
-from .models import Post
-
-class PostForm(forms.ModelForm):
+class GroupForm(forms.ModelForm):
 
     class Meta:
-        model = Post
-        fields = ('title', 'text', 'created_date',)
+        model = Group
+        fields = ('people', 'destination', 'landmark', 'exitmark',)
+
+class RouteForm(forms.ModelForm):
+
+    class Meta:
+        model = Route
+        fields = ('route',)

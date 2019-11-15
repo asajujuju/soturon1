@@ -1,36 +1,66 @@
 from django.db import models
 from django.utils import timezone
 
-#�������疳����
-class Post(models.Model):
-    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    text = models.TextField()
-    created_date = models.DateTimeField(
-        default=timezone.now)
-    published_date = models.DateTimeField(
-        blank=True, null=True)
+#新宿駅周辺のカフェ、レストランの情報
+class Cafe(models.Model):
+    name = models.CharField(max_length=50)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
+    def __str__(self):
+        return self.name
 
-    def _str_(self):
-        return self.title
 
-#�����܂Ł�
+"""
+待ち合わせのためのグループ情報
+   number (int) : グループ番号
+   people (int) : グループの人数
+   destination (char) : 目的地の有無
+   landmark (char) : ランドマーク(目的地)情報
+   exitmark (char) : 出口(目的地)情報
+"""
 
-class Meeting(models.Model):
-    #PEOPLE_CHOICE = (
-    #('2','2�l'),
-    #('3','3�l'),
-    #('4','4�l'),
-    #('5','5�l'),
-    #)
-    #people = models.CharField(max_length=20)
-    destination = models.IntegerField()
-    #landmark = models.CharField(max_length=30)
-    #exitmark = models.CharField(max_length=30)
+def FileRead(t):
+    #ファイルを読み込む
+    file_data = open(t, "r")
+    firstline = True
+    #読み込んだファイルを1行ずつ表示
+    exit = []
+    for line in file_data:
+        data = line.split(' ')#空白文字で区切る
+        userval = str(data[0])#データベースに入れる値
+        dbval = int(data[1])#ユーザーが見る値
+        exit.append([dbval, userval])#出口
+    #開いたファイルを閉じる
+    file_data.close()
+    return(exit)
 
-    def _str_(self):
-        return self.people
+NumberOfPeople = ((2,2),(3,3),(4,4),(5,5),)
+DESTINATION = ((True,'あり'),(False,'なし'),)
+Exit = FileRead("exit.txt");
+Landmark = FileRead("landmark.txt");
+
+class Group(models.Model):
+    people = models.IntegerField(choices=NumberOfPeople)
+    destination = models.BooleanField(choices=DESTINATION, default=False)
+    landmark = models.IntegerField(choices=Landmark,default=0)
+    exitmark = models.IntegerField(choices=Exit,default=0)
+
+    def __str__(self):
+        return str(self.pk)
+
+"""
+個人が利用する路線、時間の情報
+   number (int) : グループ番号
+   route (char) : 駅到着時の路線
+   hour (char) : 到着時
+   minute (char) : 到着分
+"""
+
+Route = FileRead("route.txt");
+class Route(models.Model):
+    number = models.CharField(max_length=100)
+    route = models.IntegerField(choices=Route)
+
+    def __str__(self):
+        return self.number

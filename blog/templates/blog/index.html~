@@ -1,0 +1,5 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+   <a href="{% url 'select' %}">待ち合わせ</a>
+{% endblock %}

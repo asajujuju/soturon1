@@ -1,0 +1,139 @@
+<!--
+    地図上に最適な目的地、周辺情報を表示するページ
+  -->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<p>
+  <a href="{% url 'add_route' group.pk %}">追加</a>
+</p>
+
+<p>
+  グループ番号: {{ group.pk }}<br>
+  目的地: {{ group.landmark }}<br>
+  最適な待ち合わせ場所： {{ meet.0 }}<br>
+</p>
+
+<p>
+  {% for route in routes %}
+  {{ route.route }}<br>
+  {% endfor %}
+</p>
+
+<p>
+  <input type="submit">
+</p>
+
+<div id="mapcontainer" style="width:600px;height:600px"></div>
+<script>
+
+/*----------地図表示---------*/
+  var map = L.map("mapcontainer", {
+  crs: L.CRS.Simple,
+  maxZoom: 2
+  });
+
+  //地図の中心座標とズームレベルを指定。
+  //0が最小、2が最大ズーム
+  map.setView(L.latLng(-256/2, 256/2), 2);
+
+  //地図に表示するマーカー
+  var marker = L.marker([-256,256], {title: "[-256,256]"}).bindPopup("[-256,256]").addTo(map);
+  L.marker([0,0], {title: "[0,0]"}).bindPopup("[0,0]").addTo(map);
+
+  //地図を表示。(画像がある場所のパスを指定しています。この通りでないと表示できないので注意。)
+  L.tileLayer("../static/nodemap/{z}/{x}/{y}.png", {
+  attribution: "<a>自作タイル</a>"
+  }).addTo(map);
+
+
+  /*地図上にある任意のノードにピンを打つ処理を書いてます。*/
+
+  //ノード番号と座標のデータを格納する変数。
+  var result = [];
+
+  function getCSV(){
+      var req = new XMLHttpRequest(); // HTTPでファイルを読み込むためのXMLHttpRrequestオブジェクトを生成
+      req.open("get", "../static/nodemap/nodelast.csv", true); // アクセスするファイルを指定
+      req.send(null); // HTTPリクエストの発行
+
+      // レスポンスが返ってきたらconvertCSVtoArray()を呼ぶ
+      req.onload = function(){
+  	     convertCSVtoArray(req.responseText); // 渡されるのは読み込んだCSVデータ
+         for (var i=0; i<result.length; i++) {
+           /* ---ここでノード番号を指定!!!---  */
+           if (result[i][0] == 220 || result[i][0] == 217 || result[i][0] == {{ meet.0 }}) {
+             //指定された番号を探してピンを打つ
+             L.marker([result[i][1],result[i][2]], {title: result[i][0]}).bindPopup(result[i][0]).addTo(map);
+           }
+         }
+      }
+  }
+
+  /*
+  result配列の中はこんな感じ。
+    [
+      [number, lat, lng]
+      [number, lat, lng]
+      ...
+    ]
+  result[i][0]でノード番号、result[i][1]でy座標、result[i][2]でx座標
+  を取り出すことができる。
+  */
+  function convertCSVtoArray(str){ // 読み込んだCSVデータが文字列として渡される
+    var tmp = str.split("\n"); // 改行を区切り文字として行を要素とした配列を生成
+
+    // 各行ごとにカンマで区切った文字列を要素とした二次元配列を生成
+    for(var i=0;i<tmp.length;++i){
+        result[i] = tmp[i].split(',');
+    }
+  }
+
+  //上記の関数を読み込んだ後でgetCSV関数を呼び出して処理実行。
+  getCSV();
+
+
+
+/*---ここから下は地理院の地図を表示するための処理。一応残してく。---*/
+  /*
+  var map = L.map('mapcontainer');
+  map.setView([35.689761, 139.700523], 17);
+
+  var marker = L.marker([35.689761, 139.700523]).bindPopup("新宿駅").addTo(map);
+
+  var redIcon = L.icon({
+    iconUrl: '../../static/img/marker-icon-red.png',
+    iconRetinaUrl: '../../static/img/marker-icon-red-2x.png',
+  });
+  var greenIcon = L.icon({
+    iconUrl: '../../static/img/marker-icon-green.png',
+    iconRetinaUrl: '../../static/img/marker-icon-green-2x.png',
+  });
+
+
+  var markerList = [
+  { pos: [35.690690, 139.700273], name: "中央線" },
+  { pos: [35.691761, 139.700523], name: "埼京線" },
+  { pos: [35.692761, 139.700523], name: "山手線" },
+  { pos: [35.688761, 139.700723], name: "京王線" },
+  { pos: [35.689761, 139.700273], name: "都営新宿線" },
+  ];
+  var i = 0;
+
+
+  {% for cafe in cafes %}
+  markerList.push({pos: [{{ cafe.latitude }}, {{ cafe.longitude }}], name: {{ cafe.name }});
+  L.marker([{{ cafe.latitude }}, {{ cafe.longitude }}], {icon: greenIcon}, {title: "cafe" }).bindPopup("cafe").addTo(map);
+  {% endfor %}
+
+  {% for route in routes %}
+  L.marker(markerList[i].pos, {icon: redIcon}, {title: markerList[i].name}).bindPopup(markerList[i].name).addTo(map);
+  i = i+1;
+  {% endfor %}
+
+
+  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+  attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
+  }).addTo(map);*/
+</script>
+{% endblock %}
