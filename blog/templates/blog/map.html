@@ -2,6 +2,7 @@
     地図上に最適な目的地、周辺情報を表示するページ
   -->
 {% extends 'blog/base.html' %}
+{% load static %}
 
 {% block content %}
 <p>
@@ -16,13 +17,16 @@
 
 <p>
   {% for route in routes %}
-  {{ route.route }}<br>
+  路線: {{ route.route }}<br>
   {% endfor %}
 </p>
 
 <p>
-  <input type="submit">
+  <button type="button" onclick="changeLayer('/map')">新map</button>
+  <button type="button" onclick="changeLayer('/map2')">旧map</button>
 </p>
+
+
 
 <div id="mapcontainer" style="width:600px;height:600px"></div>
 <script>
@@ -30,38 +34,52 @@
 /*----------地図表示---------*/
   var map = L.map("mapcontainer", {
   crs: L.CRS.Simple,
-  maxZoom: 2
+  minZoom: 0,
+  maxZoom: 2,
   });
 
   //地図の中心座標とズームレベルを指定。
   //0が最小、2が最大ズーム
-  map.setView(L.latLng(-256/2, 256/2), 2);
+  map.setView(L.latLng(-256/2, 256/2), 0);
 
   //地図に表示するマーカー
-  var marker = L.marker([-256,256], {title: "[-256,256]"}).bindPopup("[-256,256]").addTo(map);
-  L.marker([0,0], {title: "[0,0]"}).bindPopup("[0,0]").addTo(map);
+  var imgsrc = "<img src='{% static 'img/' %}seira.jpg' width='120' height='150'>";
+  var popup1 = L.popup({ maxWidth:300,maxHeight:500 }).setContent(imgsrc);
+  var marker = L.marker([-128,128], {title: "クリックで画像表示"})
+                .addTo(map)
+                .bindPopup(popup1);
 
   //地図を表示。(画像がある場所のパスを指定しています。この通りでないと表示できないので注意。)
-  L.tileLayer("../static/nodemap/{z}/{x}/{y}.png", {
-  attribution: "<a>自作タイル</a>"
+  tile = L.tileLayer("{% static 'nodemap2' %}" + "/map/{z}/{x}/{y}.png", {
+  attribution: "<a>自作タイル</a>",
   }).addTo(map);
 
+  //タイル差し替え
+  function changeLayer(place) {
+    tile.setUrl("{% static 'nodemap2' %}" + place + "/{z}/{x}/{y}.png");
+  }
 
-  /*地図上にある任意のノードにピンを打つ処理を書いてます。*/
 
-  //ノード番号と座標のデータを格納する変数。
+  /*地図上にある任意のノードにピンを打つ処理*/
+
+  //全ノード番号と座標データを格納するリスト
   var result = [];
+
+  //グループメンバーの路線番号を格納するリスト
+  var member = [];
+
 
   function getCSV(){
       var req = new XMLHttpRequest(); // HTTPでファイルを読み込むためのXMLHttpRrequestオブジェクトを生成
-      req.open("get", "../static/nodemap/nodelast.csv", true); // アクセスするファイルを指定
+      req.open("get", "{% static 'nodemap' %}" + "/nodelast.csv", true); // アクセスするファイルを指定
       req.send(null); // HTTPリクエストの発行
 
       // レスポンスが返ってきたらconvertCSVtoArray()を呼ぶ
       req.onload = function(){
   	     convertCSVtoArray(req.responseText); // 渡されるのは読み込んだCSVデータ
          for (var i=0; i<result.length; i++) {
-           /* ---ここでノード番号を指定!!!---  */
+           /* ---ここでノード番号を指定!!!---*/
+
            if (result[i][0] == 220 || result[i][0] == 217 || result[i][0] == {{ meet.0 }}) {
              //指定された番号を探してピンを打つ
              L.marker([result[i][1],result[i][2]], {title: result[i][0]}).bindPopup(result[i][0]).addTo(map);
