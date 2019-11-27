@@ -83,8 +83,11 @@ def map(request, pk):
     station = GateFileRead()#startroute.txtの中身
     stationNo = [x[0] for x in station]#駅番号
     gateNo = [x[1] for x in station]#改札番号
-    p = [0,2]#使用する駅
-    line = []#meetに与える路線の引数
+    p = []#使用する駅
+    for route in routes:
+        p.append(route.route)
+    print(p)
+    line = [] #meetに与える路線の引数
     #lineの中身
     for index, item in enumerate(p):
         a = []
