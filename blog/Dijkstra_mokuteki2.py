@@ -230,7 +230,7 @@ def noDestination(route_map, nTown, src, num):
             if half<maindis/2: #中間地点以下なら
                 half = half + route_map[path[i]][path[i+1]]
                 index = i+1
-                meet.append(path[index])
+        meet.append(path[index])
         return meet
     for n in range(len(other)):
         mindis = sys.maxsize #otherそれぞれのmeetへの最短距離
