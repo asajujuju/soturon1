@@ -98,7 +98,7 @@ def map(request, pk):
     print(line)
 
     if len == group.people:
-        meet = Run([220, 217], mark, dest) #待ち合わせの最適解
+        meet = Run(line, mark, dest) #待ち合わせの最適解
     return render(request, 'blog/map.html', {'group': group, 'routes': routes, 'meet': meet, 'len': len})
 
 

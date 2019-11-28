@@ -1,7 +1,7 @@
 
 # -*- coding: utf-8 -*-
 import numpy as np
-from .Dijkstra_t3 import answer
+from .Dijkstra_mokuteki2 import answer
 
 """
    地図ファイルを読み込むメソッド
