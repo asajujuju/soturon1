@@ -1,0 +1,38 @@
+<!--
+待ち合わせ情報の入力ページ
+・目的地の有無の指定
+・目的地となるランドマークか出口の設定
+・人数の指定(2~5人)
+-->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<form method="POST" class="post-form">{% csrf_token %}
+  目的地がありの場合はLandmarkかExitmark を入力してください
+  {{ form.as_p }}
+  <br>
+  <button type="submit" class="savebtn">Save</button>
+</form>
+<style>
+  button.savebtn{
+   text-align: right;
+   width: 160px;
+   padding: 0.8em;
+   text-align: center;
+   text-decoration: none;
+   color: #fff;
+   background:#0C88CA;
+   border-bottom:4px solid #005691;
+   border-radius: 4px;
+   transition: .0s;
+  }
+   button.savebtn:hover {
+    cursor: pointer;
+    text-decoration: none;
+    background:#005691;
+    transform: translate3d(0, 4px, 0);
+    transition: .0s;
+    border-bottom: none;
+   }
+</style>
+{% endblock %}

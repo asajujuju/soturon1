@@ -1,0 +1,35 @@
+<!--
+各個人の路線・到着時刻を追加するページ
+
+-->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<form method="POST" class="post-form">{% csrf_token %}
+  {{ form.as_p }}
+  <br>
+  <button type="submit" class="savebtn">Save</button>
+</form>
+<style>
+  button.savebtn{
+   text-align: right;
+   width: 160px;
+   padding: 0.8em;
+   text-align: center;
+   text-decoration: none;
+   color: #fff;
+   background:#0C88CA;
+   border-bottom:4px solid #005691;
+   border-radius: 4px;
+   transition: .0s;
+  }
+   button.savebtn:hover {
+    cursor: pointer;
+    text-decoration: none;
+    background:#005691;
+    transform: translate3d(0, 4px, 0);
+    transition: .0s;
+    border-bottom: none;
+   }
+</style>
+{% endblock %}

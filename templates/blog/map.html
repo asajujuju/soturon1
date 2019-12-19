@@ -1,0 +1,296 @@
+<!--
+    地図上に最適な目的地、周辺情報を表示するページ
+  -->
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block content %}
+<p>
+  <a href="{% url 'add_route' group.pk %}">追加</a>
+</p>
+
+<p>
+  グループ番号: {{ group.pk }}<br>
+  <!--
+目的地: {{ group.landmark }}<br>
+    -->
+  目的地: {{ landmark }}
+</p>
+
+<p>
+  {% for r in route %}
+  路線: {{ r }} <br>
+  {% endfor %}
+</p>
+
+<p class="maru1"></p>:西武新宿駅　　　　
+<p class="maru2"></p>:都営大江戸線　新宿西口駅
+<p class="maru5"></p>:都営大江戸線　新宿駅
+<p class="maru9"></p>:副都心線　新宿三丁目駅<br><br>
+<p class="maru3"></p>:丸ノ内線　新宿駅　
+<p class="maru6"></p>:丸ノ内線　新宿三丁目駅　
+<p class="maru7"></p>:都営新宿線　新宿駅　
+<p class="maru8"></p>:都営新宿線　新宿三丁目駅<br><br>
+<p class="maru4"></p>:JR線　新宿駅&emsp;　　
+<p class="maru10"></p>:京王線　新宿駅　　　　　 
+<p class="maru11"></p>:京王新線　新宿駅　　
+<p class="maru12"></p>:小田急線　新宿駅<br><br>
+
+<img src="{% static "img/gate.png"%}"/ style="padding-bottom: 2px">:改札　　
+<img src="{% static "img/stairs.png"%}"/ style="padding-bottom: 2px"> :階段　　
+<img src="{% static "img/escalator.png"%}"/ style="padding-bottom: 2px"> :エスカレーター　
+<img src="{% static "img/elevator.png"%}"/ style="padding-bottom: 2px"> :エレベーター　
+<img src="{% static "img/police.png"%}"/ style="padding-bottom: 2px"> :警察　
+<br><br>
+
+<style>
+  .maru1{
+   vertical-align: bottom;
+   display: inline-block;
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+   background-color: #58BCF2;
+  }
+   .maru2{
+    display: inline-block;
+    vertical-align: bottom;
+    width: 22px;
+    height: 22px;
+    border-radius: 22px;
+    margin: 2px;
+    background-color: #F1ABE1;
+  }
+   .maru3{
+    display: inline-block;
+    vertical-align: bottom;
+    width: 22px;
+    height: 22px;
+    border-radius: 22px;
+    margin: 2px;
+    background-color: #EB412C;
+  }
+   .maru4{
+    display: inline-block;
+    vertical-align: bottom;
+    width: 22px;
+    height: 22px;
+    border-radius: 22px;
+    margin: 2px;
+    background-color: #ED7D32;
+  }
+   .maru5{
+    display: inline-block;
+    vertical-align: bottom;
+    vertical-align: bottom;
+    width: 22px;
+    height: 22px;
+    border-radius: 22px;
+    margin: 2px;
+    background-color: #E95DFA;
+  }
+  .maru6{
+   display: inline-block;
+   vertical-align: bottom;
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+   background-color: #EE7B77;
+  }
+  .maru7{
+   display: inline-block;
+   vertical-align: bottom;
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+    background-color: #54B151;
+  }
+  .maru8{
+   display: inline-block;
+   vertical-align: bottom; 
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+   background-color: #9CF33E;
+  }
+  .maru9{
+   display: inline-block;
+   vertical-align: bottom;
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+   background-color: #F6C03E;
+  }
+  .maru10{
+   display: inline-block;
+   vertical-align: bottom;
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+   background-color: #C13422;
+  }
+  .maru11{
+   display: inline-block;
+   vertical-align: bottom;
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+   background-color: #942618;
+  }
+  .maru12{
+   display: inline-block;
+   vertical-align: bottom;
+   width: 22px;
+   height: 22px;
+   border-radius: 22px;
+   margin: 2px;
+   background-color: #964FF8;
+  }
+  .line{
+  display: inline-block;
+  vertical-align: bottom;
+  
+</style>
+
+<p>
+  <button type="button" onclick="changeLayer('/1F')" style="width:100px;height:80px"><font size="7">1F</font></button>
+  <button type="button" onclick="changeLayer('/B1')" style="width:100px;height:80px"><font size="7">B1</font></button>
+  <button type="button" onclick="changeLayer('/B2')" style="width:100px;height:80px"><font size="7">B2</font></button>
+  <button type="button" onclick="changeLayer('/B3')" style="width:100px;height:80px"><font size="7">B3</font></button>
+</p>
+
+<div id="mapcontainer" style="width:900px;height:900px"></div>
+<script>
+
+/*----------地図表示---------*/
+  var map = L.map("mapcontainer", {
+  crs: L.CRS.Simple,
+  minZoom: 0,
+  maxZoom: 2,
+  });
+
+  //地図の中心座標とズームレベルを指定。
+  //0が最小、2が最大ズーム
+  map.setView(L.latLng(-1000/2, 1000/2), 0);
+
+  //地図に表示するマーカー
+  var imgsrc = "<img src='{% static 'img/' %}seira.jpg' width='120' height='150'>";
+  var popup1 = L.popup({ maxWidth:300,maxHeight:500 }).setContent(imgsrc);
+  var marker = L.marker([-128,128], {title: "クリックで画像表示"})
+                .addTo(map)
+                .bindPopup(popup1);
+
+  //地図を表示。(画像がある場所のパスを指定しています。この通りでないと表示できないので注意。)
+  tile = L.tileLayer("{% static 'nodemap2' %}" + "/map/{z}/{x}/{y}.png", {
+    tileSize: 1000,
+  attribution: "<a>自作タイル</a>",
+  }).addTo(map);
+
+  //タイル差し替え
+  function changeLayer(place) {
+    tile.setUrl("{% static 'nodemap2' %}" + place + "/{z}/{x}/{y}.png");
+  }
+
+
+  /*地図上にある任意のノードにピンを打つ処理*/
+
+  //全ノード番号と座標データを格納するリスト
+  var result = [];
+
+  //グループメンバーの路線番号を格納するリスト
+  var member = [];
+
+
+  function getCSV(){
+      var req = new XMLHttpRequest(); // HTTPでファイルを読み込むためのXMLHttpRrequestオブジェクトを生成
+      req.open("get", "{% static 'nodemap' %}" + "/nodelast.csv", true); // アクセスするファイルを指定
+      req.send(null); // HTTPリクエストの発行
+
+      // レスポンスが返ってきたらconvertCSVtoArray()を呼ぶ
+      req.onload = function(){
+  	     convertCSVtoArray(req.responseText); // 渡されるのは読み込んだCSVデータ
+         for (var i=0; i<result.length; i++) {
+           /* ---ここでノード番号を指定!!!---*/
+
+           if (result[i][0] == 220 || result[i][0] == 217 || result[i][0] == {{ meet.0 }}) {
+             //指定された番号を探してピンを打つ
+             L.marker([result[i][1],result[i][2]], {title: result[i][0]}).bindPopup(result[i][0]).addTo(map);
+           }
+         }
+      }
+  }
+
+  /*
+  result配列の中はこんな感じ。
+    [
+      [number, lat, lng]
+      [number, lat, lng]
+      ...
+    ]
+  result[i][0]でノード番号、result[i][1]でy座標、result[i][2]でx座標
+  を取り出すことができる。
+  */
+  function convertCSVtoArray(str){ // 読み込んだCSVデータが文字列として渡される
+    var tmp = str.split("\n"); // 改行を区切り文字として行を要素とした配列を生成
+
+    // 各行ごとにカンマで区切った文字列を要素とした二次元配列を生成
+    for(var i=0;i<tmp.length;++i){
+        result[i] = tmp[i].split(',');
+    }
+  }
+
+  //上記の関数を読み込んだ後でgetCSV関数を呼び出して処理実行。
+  getCSV();
+
+
+
+/*---ここから下は地理院の地図を表示するための処理。一応残してく。---*/
+  /*
+  var map = L.map('mapcontainer');
+  map.setView([35.689761, 139.700523], 17);
+
+  var marker = L.marker([35.689761, 139.700523]).bindPopup("新宿駅").addTo(map);
+
+  var redIcon = L.icon({
+    iconUrl: '../../static/img/marker-icon-red.png',
+    iconRetinaUrl: '../../static/img/marker-icon-red-2x.png',
+  });
+  var greenIcon = L.icon({
+    iconUrl: '../../static/img/marker-icon-green.png',
+    iconRetinaUrl: '../../static/img/marker-icon-green-2x.png',
+  });
+
+
+  var markerList = [
+  { pos: [35.690690, 139.700273], name: "中央線" },
+  { pos: [35.691761, 139.700523], name: "埼京線" },
+  { pos: [35.692761, 139.700523], name: "山手線" },
+  { pos: [35.688761, 139.700723], name: "京王線" },
+  { pos: [35.689761, 139.700273], name: "都営新宿線" },
+  ];
+  var i = 0;
+
+
+  {% for cafe in cafes %}
+  markerList.push({pos: [{{ cafe.latitude }}, {{ cafe.longitude }}], name: {{ cafe.name }});
+  L.marker([{{ cafe.latitude }}, {{ cafe.longitude }}], {icon: greenIcon}, {title: "cafe" }).bindPopup("cafe").addTo(map);
+  {% endfor %}
+
+  {% for route in routes %}
+  L.marker(markerList[i].pos, {icon: redIcon}, {title: markerList[i].name}).bindPopup(markerList[i].name).addTo(map);
+  i = i+1;
+  {% endfor %}
+
+
+  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+  attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
+  }).addTo(map);*/
+</script>
+{% endblock %}
