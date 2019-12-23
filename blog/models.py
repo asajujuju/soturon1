@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.utils import timezone
 
@@ -37,16 +38,18 @@ def FileRead(t):
 
 NumberOfPeople = ((2,2),(3,3),(4,4),(5,5),)
 DESTINATION = ((True,'あり'),(False,'なし'),)
-#Exit = FileRead("nanana3.pythonanywhere.com/exit.txt");
-#Landmark = FileRead("nanana3.pythonanywhere.com/landmark.txt");
-Exit = FileRead("exit.txt");
-Landmark = FileRead("landmark.txt");
+Exit = FileRead("exit.txt")
+#Exit = FileRead("/home/nanako/nanako.pythonanywhere.com/exit.txt")
+Landmark = FileRead("landmark.txt")
+#Landmark = FileRead("/home/nanako/nanako.pythonanywhere.com/landmark.txt")
 
 class Group(models.Model):
     people = models.IntegerField(choices=NumberOfPeople)
     destination = models.BooleanField(choices=DESTINATION, default=False)
+#文字を格納する
     landmark = models.IntegerField(choices=Landmark,default=0)
     exitmark = models.IntegerField(choices=Exit,default=0)
+
 
     def __str__(self):
         return str(self.pk)
@@ -59,11 +62,11 @@ class Group(models.Model):
    minute (char) : 到着分
 """
 
-#Route = FileRead("nanana3.pythonanywhere.com/route.txt");
-Route = FileRead("route.txt");
+Route = FileRead("route.txt")
+#Route = FileRead("/home/nanako/nanako.pythonanywhere.com/route.txt");
 class Route(models.Model):
     number = models.CharField(max_length=100)
-    route = models.IntegerField(choices=Route)
+    route = models.IntegerField(choices=Route,default=0)
 
     def __str__(self):
         return self.number
