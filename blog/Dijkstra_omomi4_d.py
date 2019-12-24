@@ -334,7 +334,7 @@ def noDestination(route_map, nTown, src, lineNum):
                 half = half + route_map[path[i]][path[i+1]]
                 index = i+1
         print("distance: "+str(maindis)+" half: "+str(half))
-        meet.append(path[index])
+        meet.extend([[path[index]],[path[index]]])
         return (meet,kaisatu)
     for n in range(len(other)):
         mindis = sys.maxsize #otherそれぞれのmeetへの最短距離

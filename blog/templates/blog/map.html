@@ -21,24 +21,34 @@
   {% endfor %}
 </p>
 
-<p class="maru1"></p>:西武新宿駅　　　　
-<p class="maru2"></p>:都営大江戸線　新宿西口駅
-<p class="maru5"></p>:都営大江戸線　新宿駅
-<p class="maru9"></p>:副都心線　新宿三丁目駅<br><br>
-<p class="maru3"></p>:丸ノ内線　新宿駅　
-<p class="maru6"></p>:丸ノ内線　新宿三丁目駅　
-<p class="maru7"></p>:都営新宿線　新宿駅　
-<p class="maru8"></p>:都営新宿線　新宿三丁目駅<br><br>
-<p class="maru4"></p>:JR線　新宿駅&emsp;　　
-<p class="maru10"></p>:京王線　新宿駅　　　　　
-<p class="maru11"></p>:京王新線　新宿駅　　
-<p class="maru12"></p>:小田急線　新宿駅<br><br>
-
+<table width="800">
+    <tr>
+        <th><p class="maru1"></p>:西武新宿駅</th> 　　　
+        <th><p class="maru2"></p>:都営大江戸線　新宿西口駅</th>
+        <th><p class="maru5"></p>:都営大江戸線　新宿駅</th>
+    </tr>
+    <tr>
+        <th><p class="maru9"></p>:副都心線　新宿三丁目駅</th>
+        <th><p class="maru3"></p>:丸ノ内線　新宿駅</th>　
+        <th><p class="maru6"></p>:丸ノ内線　新宿三丁目駅</th>
+    </tr>
+    <tr>
+        <th><p class="maru7"></p>:都営新宿線　新宿駅</th>
+        <th><p class="maru8"></p>:都営新宿線　新宿三丁目駅</th>
+        <th><p class="maru4"></p>:JR線　新宿駅</th>
+    </tr>
+    <tr>
+        <th><p class="maru10"></p>:京王線　新宿駅</th>
+        <th><p class="maru11"></p>:京王新線　新宿駅</th>　
+        <th><p class="maru12"></p>:小田急線　新宿駅</th>
+    </tr>
+</table>
+<br>
 <img src="{% static "img/gate.png"%}"/ style="padding-bottom: 2px">:改札　　
 <img src="{% static "img/stairs.png"%}"/ style="padding-bottom: 2px"> :階段　　
 <img src="{% static "img/escalator.png"%}"/ style="padding-bottom: 2px"> :エスカレーター　
 <img src="{% static "img/elevator.png"%}"/ style="padding-bottom: 2px"> :エレベーター　
-<img src="{% static "img/police.png"%}"/ style="padding-bottom: 2px"> :警察　
+<img src="{% static "img/police.png"%}"/ style="padding-bottom: 2px"> :警察
 <br><br>
 
 <style>
@@ -157,11 +167,15 @@
 </style>
 
 <p>
-  <button type="button" onclick="changeLayer('/node_zahyou')" style="width:100px;height:80px"><font size="5">座標</font></button>
-  <button type="button" onclick="changeLayer('/1F')" style="width:100px;height:80px"><font size="5">1F</font></button>
-  <button type="button" onclick="changeLayer('/B1')" style="width:100px;height:80px"><font size="5">B1</font></button>
-  <button type="button" onclick="changeLayer('/B2')" style="width:100px;height:80px"><font size="5">B2</font></button>
-  <button type="button" onclick="changeLayer('/B3')" style="width:100px;height:80px"><font size="5">B3</font></button>
+    <button type="button" onclick="changeLayer('/1F')" style="width:100px;height:80px"><font size="3">案１</font></button>
+    <button type="button" onclick="changeLayer('/B1')" style="width:100px;height:80px"><font size="3">案２</font></button>
+</p>
+
+<p>
+  <button type="button" onclick="changeLayer('/1F')" style="width:125px;height:100px"><font size="7">1F</font></button>
+  <button type="button" onclick="changeLayer('/B1')" style="width:125px;height:100px"><font size="7">B1</font></button>
+  <button type="button" onclick="changeLayer('/B2')" style="width:125px;height:100px"><font size="7">B2</font></button>
+  <button type="button" onclick="changeLayer('/B3')" style="width:125px;height:100px"><font size="7">B3</font></button>
 </p>
 
 
@@ -262,38 +276,11 @@
   //タイル差し替え関数
   function changeLayer(place) {
     tile.setUrl("{% static 'nodemap2' %}" + place + "/{z}/{x}/{y}.png");
-    /*
-    switch (place) {
-      case '/1F':
-        map.removeLayer(markerList_other);
-        map.removeLayer(markerList_B1);
-        map.removeLayer(markerList_B2);
-        map.removeLayer(markerList_B3);
-        map.addLayer(markerList_1F);
-        break;
-      case '/B1':
-        map.removeLayer(markerList_other);
-        map.removeLayer(markerList_1F);
-        map.removeLayer(markerList_B2);
-        map.removeLayer(markerList_B3);
-        map.addLayer(markerList_B1);
-        break;
-      case '/B2':
-        map.removeLayer(markerList_other);
-        map.removeLayer(markerList_1F);
-        map.removeLayer(markerList_B1);
-        map.removeLayer(markerList_B3);
-        map.addLayer(markerList_B2);
-        break;
-      case '/B3':
-        map.removeLayer(markerList_other);
-        map.removeLayer(markerList_1F);
-        map.removeLayer(markerList_B1);
-        map.removeLayer(markerList_B2);
-        map.addLayer(markerList_B3);
-        break;
-    }*/
-    //map.removeLayer(markerList_other);
+  }
+
+  //待ち合わせ場所案切り替え
+  function changeMeetPoint(){
+
   }
 </script>
 {% endblock %}

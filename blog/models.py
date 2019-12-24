@@ -66,7 +66,7 @@ Route = FileRead("route.txt")
 #Route = FileRead("/home/nanako/nanako.pythonanywhere.com/route.txt");
 class Route(models.Model):
     number = models.CharField(max_length=100)
-    route = models.IntegerField(choices=Route,default=0)
+    route = models.IntegerField(choices=Route)
 
     def __str__(self):
         return self.number

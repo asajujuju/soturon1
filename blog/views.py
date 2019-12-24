@@ -93,8 +93,10 @@ def point(meet_node):
     file_data.close()
     #pの初期値
     p = []
+    print(meet_node)
     #meetの情報をpointに変換
     for case in meet_node:
+        print(case)
         c = []
         for m in case:
             pp = -1
@@ -108,6 +110,16 @@ def point(meet_node):
         p.append(c) #ケース別で格納
     #値を返す
     return p
+
+"""
+重複しているものを消去する
+"""
+def checker(meet):
+    a = []
+    for i in meet:
+        b = list(set(i))
+        a.append(b)
+    return a
 
 """
 select.htmlやadd.htmlでSaveボタンを押した時のリダイレクト先。
@@ -173,13 +185,9 @@ def map(request, pk):
         print(meet)
         meet2 = point(meet)
         print(meet2)
-        finalmeet = [] #最終的に返す目的地の配列
-        for index0 in range(len(meet2)):
-            for index1 in range(len(meet[index0])):
-                if index1 != 0 and meet2[index0][index1] in meet2[index0]:
-                    break
-                finalmeet.append(meet2[index0][index1])
+        finalmeet = checker(meet2) #最終的に返す目的地の配列
         print("point利用"+str(finalmeet))
+        meet = finalmeet
     return render(request, 'blog/map.html', {'landmark': landmark,'route': route, 'group': group, 'routes': routes, 'meet': meet, 'length': length,})
 
 
