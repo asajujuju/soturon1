@@ -93,18 +93,21 @@ def point(meet_node):
     file_data.close()
     #pの初期値
     p = []
-    #mの情報をpointに変換
+    #meetの情報をpointに変換
     for case in meet_node:
+        c = []
         for m in case:
-            for index, item in enumerate(MeetToPoint):
-                if MeetToPoint[index][0] == m:
-                    p.append(MeetToPoint[index][1])#待ち合わせ場所
-    #pの配列が空の時
-    if not p:
-        p.append(m)#元の最適解
+            pp = -1
+            for item in MeetToPoint:
+                if item[0] == m: #待ち合わせポイントがある時
+                    pp = item[1]#待ち合わせ場所
+            if pp == -1: #待ち合わせポイントがない時
+                c.append(m)
+            else:
+                c.append(pp)
+        p.append(c) #ケース別で格納
     #値を返す
     return p
-
 
 """
 select.htmlやadd.htmlでSaveボタンを押した時のリダイレクト先。
@@ -168,7 +171,15 @@ def map(request, pk):
     if length == group.people:
         meet, kaisatu = Run(p, mark, dest) #待ち合わせの最適解
         print(meet)
-        #meet2 = point(meet)
+        meet2 = point(meet)
+        print(meet2)
+        finalmeet = [] #最終的に返す目的地の配列
+        for index0 in range(len(meet2)):
+            for index1 in range(len(meet[index0])):
+                if index1 != 0 and meet2[index0][index1] in meet2[index0]:
+                    break
+                finalmeet.append(meet2[index0][index1])
+        print("point利用"+str(finalmeet))
     return render(request, 'blog/map.html', {'landmark': landmark,'route': route, 'group': group, 'routes': routes, 'meet': meet, 'length': length,})
 
 

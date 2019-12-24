@@ -67,7 +67,7 @@ def Destination(route_map, nTown, src, dst, lineNum):
                     maindis = d
                     M = src[0][1][i]
             kaisatu[0] = M
-            meet.append(M)
+            meet.extend([[M],[M]])
             return (meet,kaisatu)
         if src[0][0]==src[1][0]==2:
             for n in range(lineNum):
@@ -92,7 +92,13 @@ def Destination(route_map, nTown, src, dst, lineNum):
             print("目的地あり:　"+str(other))
             for i in range(len(other)):
                 m,d = meetDist(route_map, nTown, other[i], dst, mainvia)
-                meet.append(m)
+                joinmeet.append(m)
+            for n in range(len(joinmeet)): #目的地に最も近い待ち合わせ場所を算出
+                d,v = solve(route_map, nTown, joinmeet[n], dst)
+                if d<neardst:
+                    neardst = d
+                    nearmeet = joinmeet[n]
+            meet.extend([joinmeet,[nearmeet]])
             return (meet,kaisatu)
 
         #重複数に偏りがあるとき
@@ -185,8 +191,9 @@ def noDestination(route_map, nTown, src, lineNum):
     if src[0][0]!=1: #重複している
         if lineNum==1: #全員が同じ路線の時→改札を返す
             for i in range(len(src[0][1])):
-                meet.append(src[0][1][i])
+                joinmeet.append(src[0][1][i])
                 kaisatu.append(src[0][1][i])
+            meet.extend([joinmeet,joinmeet])
             return (meet,kaisatu)
         if lineNum==2: #使用路線数が2→人数の多い路線の改札に集合するとき
             if src[0][0]==2 and src[1][0]==2: #4人.2.2
@@ -209,7 +216,7 @@ def noDestination(route_map, nTown, src, lineNum):
                         index = i+1
                 print("distance: "+str(maindis)+" half: "+str(half))
                 kaisatu.extend([start,goal])
-                meet.append(path[index])
+                meet.extend([[path[index]],[path[index]]])
                 return (meet,kaisatu)
 
             for i in range(len(src[0][1])):
@@ -223,7 +230,7 @@ def noDestination(route_map, nTown, src, lineNum):
                         maindis = d
                         M = src[0][1][i]
             kaisatu.extend([start,goal])
-            meet.append(M)
+            meet.extend([[M],[M]])
             return (meet,kaisatu)
 
         #以降使用路線数が2以上の時

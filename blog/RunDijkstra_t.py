@@ -1,5 +1,5 @@
 import numpy as np
-from .Dijkstra_omomi2_d import answer
+from .Dijkstra_omomi4_d import answer
 
 """
    地図ファイルを読み込むメソッド
