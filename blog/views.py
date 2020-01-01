@@ -40,6 +40,7 @@ def select(request):
 
 def FileRead(t):
     #ファイルを読み込む
+    #file_data = open("/home/nanako/nanako.pythonanywhere.com/" + t, "r")
     file_data = open(t, "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
@@ -60,6 +61,7 @@ startrout.txtを読み込む
 """
 def GateFileRead():
     #ファイルを読み込む
+    #file_data = open("/home/nanako/nanako.pythonanywhere.com/startroute.txt", "r")
     file_data = open("startroute.txt", "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
@@ -80,6 +82,7 @@ def GateFileRead():
 """
 def point(meet_node):
     #ファイルを読み込む
+    #file_data = open("/home/nanako/nanako.pythonanywhere.com/point.txt", "r")
     file_data = open("point.txt", "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
@@ -93,17 +96,31 @@ def point(meet_node):
     file_data.close()
     #pの初期値
     p = []
-    #mの情報をpointに変換
+    #meetの情報をpointに変換
     for case in meet_node:
+        c = []
         for m in case:
-            for index, item in enumerate(MeetToPoint):
-                if MeetToPoint[index][0] == m:
-                    p.append(MeetToPoint[index][1])#待ち合わせ場所
-    #pの配列が空の時
-    if not p:
-        p.append(m)#元の最適解
+            pp = -1
+            for item in MeetToPoint:
+                if item[0] == m: #待ち合わせポイントがある時
+                    pp = item[1]#待ち合わせ場所
+            if pp == -1: #待ち合わせポイントがない時
+                c.append(m)
+            else:
+                c.append(pp)
+        p.append(c) #ケース別で格納
     #値を返す
     return p
+
+"""
+ 重複しているものを消去する
+"""
+def checker(meet):
+    a = []
+    for i in meet:
+        b = list(set(i))
+        a.append(b)
+    return a
 
 
 """
@@ -131,6 +148,7 @@ def map(request, pk):
             if i == land[0]:
                 route.append(land[1])
 
+    print(route)
     landmark = "なし"
     if group.destination:
         dest = True
@@ -147,28 +165,18 @@ def map(request, pk):
                 if mark == land[0]:
                     landmark = land[1]
 
-    #使用する駅ごとの改札番号を割り出す
-    station = GateFileRead()#startroute.txtの中身
-    stationNo = [x[0] for x in station]#駅番号
-    gateNo = [x[1] for x in station]#改札番号
     p = []#使用する駅
     for r in routes:
         p.append(r.route)
     print(p)
-    line = [] #meetに与える路線の引数
-    #lineの中身
-    for index, item in enumerate(p):
-        a = []
-        for index2, item2 in enumerate(stationNo):
-            if item == item2:
-                a.append(gateNo[index2])
-        line.append(a)
-    #print(line)
 
     if length == group.people:
         meet, kaisatu = Run(p, mark, dest) #待ち合わせの最適解
         print(meet)
-        #meet2 = point(meet)
+        meet2 = point(meet)
+        finalmeet = checker(meet2) #最終的に返す目的地の配列
+        print("point利用"+str(finalmeet))
+        meet = finalmeet
     return render(request, 'blog/map.html', {'landmark': landmark,'route': route, 'group': group, 'routes': routes, 'meet': meet, 'length': length,})
 
 

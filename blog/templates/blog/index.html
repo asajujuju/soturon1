@@ -3,7 +3,16 @@
 待ち合わせ/乗り換え の選択をする
 -->
 {% extends 'blog/base.html' %}
+{% load static %}
 
 {% block content %}
-<a href="{% url 'select' %}">待ち合わせ</a>
+<br>
+<a href="{% url 'select' %}"><font size="5">待ち合わせ</font></a>
+<br>
+<br>
+<br>
+<p><font size="5">使い方の説明↓</font></p>
+<img src="{% static 'img/howTo/page1_1.png' %}"><br>
+<img src="{% static 'img/howTo/page1_2.png' %}">
+
 {% endblock %}

@@ -23,6 +23,7 @@ class Cafe(models.Model):
 
 def FileRead(t):
     #ファイルを読み込む
+    #file_data = open("/home/nanako/nanako.pythonanywhere.com/" + t, "r")
     file_data = open(t, "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
@@ -38,10 +39,10 @@ def FileRead(t):
 
 NumberOfPeople = ((2,2),(3,3),(4,4),(5,5),)
 DESTINATION = ((True,'あり'),(False,'なし'),)
+#Exit = FileRead("exit.txt")
 Exit = FileRead("exit.txt")
-#Exit = FileRead("/home/nanako/nanako.pythonanywhere.com/exit.txt")
+#Landmark = FileRead("landmark.txt")
 Landmark = FileRead("landmark.txt")
-#Landmark = FileRead("/home/nanako/nanako.pythonanywhere.com/landmark.txt")
 
 class Group(models.Model):
     people = models.IntegerField(choices=NumberOfPeople)
@@ -58,15 +59,13 @@ class Group(models.Model):
 個人が利用する路線、時間の情報
    number (int) : グループ番号
    route (char) : 駅到着時の路線
-   hour (char) : 到着時
-   minute (char) : 到着分
 """
 
-Route = FileRead("route.txt")
-#Route = FileRead("/home/nanako/nanako.pythonanywhere.com/route.txt");
+#Route = FileRead("route.txt")
+Route = FileRead("route.txt");
 class Route(models.Model):
     number = models.CharField(max_length=100)
-    route = models.IntegerField(choices=Route,default=0)
+    route = models.IntegerField(choices=Route)
 
     def __str__(self):
         return self.number

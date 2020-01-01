@@ -1,5 +1,5 @@
 import numpy as np
-from .Dijkstra_omomi2_d import answer
+from .Dijkstra_omomi4_d import answer
 
 """
    地図ファイルを読み込むメソッド
@@ -7,6 +7,7 @@ from .Dijkstra_omomi2_d import answer
 def FileRead():
     #ファイルを読み込む
     file_data = open("newroute.txt", "r")
+    #file_data = open("/home/nanako/nanako.pythonanywhere.com/newroute.txt", "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
     for line in file_data:
