@@ -23,8 +23,8 @@ class Cafe(models.Model):
 
 def FileRead(t):
     #ファイルを読み込む
-    #file_data = open("/home/nanako/nanako.pythonanywhere.com/" + t, "r")
-    file_data = open(t, "r")
+    file_data = open("/home/ri2/ri2.pythonanywhere.com/" + t, "r")
+    #file_data = open(t, "r")
     firstline = True
     #読み込んだファイルを1行ずつ表示
     exit = []
