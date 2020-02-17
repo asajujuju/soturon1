@@ -1,5 +1,5 @@
 import numpy as np
-from .Dijkstra_omomi4_d import answer
+from .Dijkstra_omomi6_d import answer
 
 """
    地図ファイルを読み込むメソッド
@@ -41,8 +41,8 @@ def FileRead():
 """
 def Run(src, dst, dest):
     route_map, nTown = FileRead()
-    meet, kaisatu= answer(route_map, nTown, src, dst, dest)
+    meet, kaisatu, nearpathlist = answer(route_map, nTown, src, dst, dest)
     print("meet: "+str(meet)+" usedkaisatu: "+str(kaisatu))
-    return(meet, kaisatu)
+    return(meet, kaisatu, nearpathlist)
 
 #Run([4,3,0],113, False)

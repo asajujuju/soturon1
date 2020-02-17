@@ -48,8 +48,8 @@ class Group(models.Model):
     people = models.IntegerField(choices=NumberOfPeople)
     destination = models.BooleanField(choices=DESTINATION, default=False)
 #文字を格納する
-    landmark = models.IntegerField(choices=Landmark,default=0)
-    exitmark = models.IntegerField(choices=Exit,default=0)
+    landmark = models.IntegerField(choices=Landmark, default=-1)
+    exitmark = models.IntegerField(choices=Exit, default=-1)
 
 
     def __str__(self):
@@ -65,7 +65,7 @@ class Group(models.Model):
 Route = FileRead("route.txt");
 class Route(models.Model):
     number = models.CharField(max_length=100)
-    route = models.IntegerField(choices=Route)
+    route = models.IntegerField(choices=Route, default=-1)
 
     def __str__(self):
         return self.number

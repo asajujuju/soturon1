@@ -11,14 +11,31 @@
   </p>
 
   <p>
-    グループ番号: {{ group.pk }}<br>
+    < 登録情報 ><br>
+   　待ち合わせ人数 : {{ group.people }}
+    {% if group.destination %}
+    　目的地 : {{ landmark }}<br>
+    {% else %}
+    　目的地：なし<br>
+    {% endif %}
   </p>
 
   <p>
+    < 利用路線 ><br>
     {% for r in route %}
-    路線: {{ r }} <br>
+      ・{{ r.0 }}　{{ r.1 }}人<br>
     {% endfor %}
   </p>
+
+  <p>
+    < 利用改札 ><br>
+    {% for rg in route_gate %}
+      ・{{ rg.0.0 }}　{{ rg.0.1 }}人 → {{ rg.1.0 }}
+      <br>
+    {% endfor %}
+    <br>
+  </p>
+
 </div>
 
   <p class="maru"><span>1</span></p>: 西武新宿駅　　　　　　
@@ -64,39 +81,35 @@
 
 
 <p>
-  <button type="button" onclick="changeMeetPoint(1)" style="width:100px;height:80px"><font size="5">案1</font></button>
-  <button type="button" onclick="changeMeetPoint(2)" style="width:100px;height:80px"><font size="5">案2</font></button>
+  <font size="4">
+    ＊ボタンによる階層の切り替え可<br><br>
+  <button type="button" id="kaisou1" onclick="changeLayer('1F');place_reset('kaisou2','kaisou3','kaisou4');changeColor('kaisou1')" style="width:120px;height:80px"><font size="5">地上階</font></button>
+  <button type="button" id="kaisou2" onclick="changeLayer('B1');place_reset('kaisou1','kaisou3','kaisou4');changeColor('kaisou2')" style="width:100px;height:80px"><font size="5">B1</font></button>
+  <button type="button" id="kaisou3" onclick="changeLayer('B2');place_reset('kaisou1','kaisou2','kaisou4');changeColor('kaisou3')" style="width:100px;height:80px"><font size="5">B2</font></button>
+  <button type="button" id="kaisou4" onclick="changeLayer('B3');place_reset('kaisou1','kaisou2','kaisou3');changeColor('kaisou4')" style="width:100px;height:80px"><font size="5">B3</font></button>
 </p>
-
-
-<p>
-  <button type="button" onclick="changeLayer('/1F')" style="width:100px;height:80px"><font size="5">地上階</font></button>
-  <button type="button" onclick="changeLayer('/B1')" style="width:100px;height:80px"><font size="5">B1</font></button>
-  <button type="button" onclick="changeLayer('/B2')" style="width:100px;height:80px"><font size="5">B2</font></button>
-  <button type="button" onclick="changeLayer('/B3')" style="width:100px;height:80px"><font size="5">B3</font></button>
-</p>
-
-
 
 <div id="mapcontainer" style="width:900px;height:900px"></div>
-<script>
 
+
+<script>
   /*----------地図表示---------*/
+  //地図の宣言と設定
   var map = L.map("mapcontainer", {
-  crs: L.CRS.Simple,
-  minZoom: 0,
-  maxZoom: 2,
+    crs: L.CRS.Simple,
+    minZoom: 0,
+    maxZoom: 2,
   });
 
-  //地図の中心座標とズームレベルを指定。
-  //0が最小、2が最大ズーム
+  //地図の中心座標と初期ズームレベルを指定。
   map.setView(L.latLng(-1000/2, 1000/2), 0);
 
-  //地図を表示。(画像がある場所のパスを指定しています。この通りでないと表示できないので注意。)
-  tile = L.tileLayer("{% static 'nodemap2' %}" + "/1F/{z}/{x}/{y}.png", {
+  //タイルの設定、地図上への表示。
+  var tile = L.tileLayer("{% static 'nodemap2' %}" + "/1F/{z}/{x}/{y}.png", {
     tileSize: 1000,
     attribution: "<a>自作タイル</a>",
   }).addTo(map);
+
 
   /*-----ノード上にマーカーを配置する-----*/
 
@@ -112,29 +125,11 @@
     iconAnchor: [17,55],
     iconRetinaUrl: "{% static 'img/icon' %}" + '/blue_2x.png',
   });
-  var greenIcon = L.icon({
-    iconUrl: "{% static 'img/icon' %}" + '/greenIcon.png',
-    iconSize: [25,41],
-    iconAnchor: [12.5,41],
-    iconRetinaUrl: "{% static 'img/icon' %}" + '/greenIcon_2x.png',
-  });
-  var redIcon = L.icon({
-    iconUrl: "{% static 'img/icon' %}" + '/redIcon.png',
-    iconSize: [25,41],
-    iconAnchor: [12.5,41],
-    iconRetinaUrl: "{% static 'img/icon' %}" + '/redIcon_2x.png',
-  });
-  var purpleIcon = L.icon({
-    iconUrl: "{% static 'img/icon' %}" + '/purpleIcon.png',
-    iconSize: [25,41],
-    iconAnchor: [12.5,41],
-    iconRetinaUrl: "{% static 'img/icon' %}" + '/purpleIcon_2x.png',
-  });
-  var yellowIcon = L.icon({
-    iconUrl: "{% static 'img/icon' %}" + '/yellowIcon.png',
-    iconSize: [25,41],
-    iconAnchor: [12.5, 41],
-    iconRetinaUrl: "{% static 'img/icon' %}" + '/yellowIcon_2x.png',
+  var pathIcon = L.icon({
+    iconUrl: "{% static 'img/icon' %}" + '/nakadake.png',
+    iconSize: [18,18],
+    iconAnchor: [9,9],
+    iconRetinaUrl: "{% static 'img/icon' %}" + '/nakadake.png',
   });
   var hereIcon = L.icon({
     iconUrl: "{% static 'img/icon' %}" + '/hereIcon.png',
@@ -146,14 +141,13 @@
   //全ノード番号と座標データを格納するリスト
   var result = [];
 
-  //案1と2の待ち合わせ場所ノード番号をそれぞれ格納
-  var markList1 = {{ meet.0 }};
-  var markList2 = {{ meet.1 }};
-
-  //案1と2の待ち合わせ場所の[y座標, x座標, 画像のソース, 階層]の欲張りセットを格納する。
-  var pointList_idea1 = [];
-  var pointList_idea2 = [];
-
+  //待ち合わせ場所ノード番号を格納
+  var markList2 = {{ meet }};
+  //meetが複数あった場合、markList2を昇順にソートすること！！
+  //markListのindex指定用カウンタ変数
+  var counter = 0;
+  //途中経過ノード番号を格納
+  var pathList_onePoint = {{ pathList_near }};
 
   function getCSV(){
       var req = new XMLHttpRequest(); // HTTPでファイルを読み込むためのXMLHttpRrequestオブジェクトを生成
@@ -173,69 +167,59 @@
     for(var i=0;i<tmp.length;++i){
         result[i] = tmp[i].split(',');
 
+        if(result[i][0] - 0 == markList2[counter]) {
+          search_and_add(i);
+        } else {
         switch (result[i][3] - 0) {
-          case 0:
+          case 0: //路線ノードの場合
             {% for r in routes %}
               if (result[i][0] == {{ r.route }} - 0) {
-                //markerList_idea1.addLayer(L.marker([result[i][1], result[i][2]], {icon: blueIcon}));
-                //markerList_idea2.addLayer(L.marker([result[i][1], result[i][2]], {icon: blueIcon}));
                 L.marker([result[i][1], result[i][2]], {icon: blueIcon}).addTo(map);
                 break;
               }
             {% endfor %}
             break;
-          case 1:
-            search_and_add(i);
-            //markerList_all.addLayer(L.marker([result[i][1], result[i][2]], {title: result[i][0], icon: orangeIcon}).bindPopup(result[i][0]));
+          default: //万が一上記以外の数字が出た場合は何もしない
+            search_and_add_other(i);
             break;
-          case 2:
-            search_and_add(i);
-            //markerList_all.addLayer(L.marker([result[i][1], result[i][2]]).bindPopup(result[i][0]));
-            break;
-          case 3:
-            search_and_add(i);
-            //markerList_all.addLayer(L.marker([result[i][1], result[i][2]], {title: result[i][0], icon: greenIcon}).bindPopup(result[i][0]));
-            break;
-          case 4:
-            search_and_add(i);
-            //markerList_all.addLayer(L.marker([result[i][1], result[i][2]], {title: result[i][0], icon: greenIcon}).bindPopup(result[i][0]));
-            break;
-          default:
-            break;
+          }
         }
     }
   }
 
 
-  //------マーカーのグループ分け作業用関数 アンケート時は案1の待ち合わせ場所のみを調べる。
+  //------マーカーのグループ分け作業用関数
   function search_and_add(i) {
-    for (var a=0; a<markList1.length; a++) {
-      if (result[i][0] == markList1[a]) {
+    for (var a=0; a<markList2.length; a++) {
+      //console.log(result[i][0]);
+      if (result[i][0] == markList2[a]) {
         var content1 = "";
-        if (result[i][0] - 0 == 213 || result[i][0] - 0 >= 1000) {
-          content1 = result[i][4] + "<br><img src='{% static 'img/point/' %}" + result[i][0] + ".jpg'>";
-        } else  {
-          content1 = result[i][4] + "<br>画像はありません";
+        if (result[i][0] - 0 >= 1000) {
+          content1 = "<img src='{% static 'img/point/pointImg_name/' %}" + result[i][0] + ".png'>";
+        } else {
+          content1 = "この周辺がおすすめです";
+        }
+        var kaisou = result[i][4];
+        if (kaisou.startsWith("B")) {
+          changeLayer(kaisou);
+        } else {
+          changeLayer("1F");
         }
         var popup = L.popup({ maxWidth:800, maxHeight:800 });
         popup.setContent(content1);
-        markerList_idea1.addLayer(L.marker([result[i][1], result[i][2]], {icon: hereIcon}).bindPopup(popup).openPopup());
+        markerList_idea2.addLayer(L.marker([result[i][1], result[i][2]], {icon: hereIcon}).bindPopup(popup).openPopup());
         break;
       }
     }
+  }
 
-    for (var a=0; a<markList2.length; a++) {
-      if (result[i][0] == markList2[a]) {
-        var content2 = "";
-        if (result[i][0] - 0 == 213 || result[i][0] - 0 >= 1000) {
-          content2 = result[i][4]+"<br><img src='{% static 'img/point/' %}" + result[i][0] + ".jpg'>";
-        } else  {
-          content2 = result[i][4] + "<br>画像はありません";
+  function search_and_add_other(i) {
+    for(var idx = 0; idx < pathList_onePoint.length; idx++) {
+      for (var a = 0; a < pathList_onePoint[idx].length; a++) {
+        if (result[i][0] == pathList_onePoint[idx][a]) {
+          markerList_idea2.addLayer(L.marker([result[i][1], result[i][2]], {icon: pathIcon}));
+          break;
         }
-        var popup2 = L.popup({ maxWidth:800, maxHeight:800 });
-        popup2.setContent(content2);
-        markerList_idea2.addLayer(L.marker([result[i][1], result[i][2]], {icon: hereIcon}).bindPopup(popup).openPopup());
-        break;
       }
     }
   }
@@ -244,21 +228,28 @@
   //上の方に書いてあるgetCSV関数を呼び出して処理実行。
   getCSV();
 
-  map.addLayer(markerList_idea1);
+  map.addLayer(markerList_idea2.openPopup());
 
-  //タイル差し替え関数
+  //タイル差し替え用関数
   function changeLayer(place) {
-    tile.setUrl("{% static 'nodemap2' %}" + place + "/{z}/{x}/{y}.png");
+    console.log("{% static 'nodemap2/' %}" + place + "/{z}/{x}/{y}.png");
+    tile.setUrl("{% static 'nodemap2/' %}" + place + "/{z}/{x}/{y}.png");
   }
 
-  function changeMeetPoint(number) {
-    if (number == 1) {
-      map.addLayer(markerList_idea1.openPopup());
-      map.removeLayer(markerList_idea2);
-    } else if (number == 2) {
-      map.addLayer(markerList_idea2.openPopup());
-      map.removeLayer(markerList_idea1);
-    }
+  //ボタン色切り替え用関数
+  function changeColor(idname){
+    var obj = document.getElementById(idname);
+    obj.style.backgroundColor = '#87ceed';
+  }
+
+  //ボタン色リセット用関数
+  function place_reset(idname,idname1,idname2){
+    var obj = document.getElementById(idname);
+    var obj1 = document.getElementById(idname1);
+    var obj2 = document.getElementById(idname2);
+    obj.style.backgroundColor = '#efefef';
+    obj1.style.backgroundColor = '#efefef';
+    obj2.style.backgroundColor = '#efefef';
   }
 
 </script>

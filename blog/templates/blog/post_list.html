@@ -1,0 +1,8 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+{% for cafe in cafes%}
+  marker = L.marker([{{ cafe.latitude }}, {{ cafe.longitude }}]).addTo(map);
+  marker.bindPopup({{ cafe.name }}).openPopup();
+{% endfor%}
+{% endblock %}
