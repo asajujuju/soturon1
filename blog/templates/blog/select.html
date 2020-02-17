@@ -7,8 +7,18 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
+
 <form method="POST" class="post-form">{% csrf_token %}
+  {{ errorM }}<br>
+  <br>
   {{ form.as_p }}
-  <button type="submit" class="save btn btn-default">Save</button>
+  <button type="submit" class="save btn btn-default">Save</button><br><br>
 </form>
+
+<p><font size="4">
+    ＊目的地ありの場合<br>
+    【Landmark(目的地)】or【Exitmark(目的地付近の出口)】を選択<br><br>
+</font>
+</p>
+
 {% endblock %}

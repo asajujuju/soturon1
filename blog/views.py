@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Group, Route, Cafe
 from .forms import GroupForm, RouteForm
-import numpy
+import numpy as np
 from .RunDijkstra_t import Run
 
 # Create your views here.
@@ -26,55 +26,39 @@ select.htmlでSaveボタンを押した時:
       ・map.htmlにリダイレクトする
 """
 def select(request):
+    errorM = ""
     if request.method == "POST":
         form = GroupForm(request.POST)
         if form.is_valid():
             group = form.save(commit=False)
+            if group.destination and group.landmark==-1 and group.exitmark==-1:
+                 form = GroupForm()
+                 errorM = "入力が正しくありません"
+                 return render(request, 'blog/select.html', {'form': form, 'errorM': errorM})
             group.save()
             return redirect('map', pk=group.pk)
+        else:
+            form = GroupForm()
+            return render(request, 'blog/select.html', {'form': form, 'errorM': errorM})
+
     else:
         form = GroupForm()
-    return render(request, 'blog/select.html', {'form': form})
+        return render(request, 'blog/select.html', {'form': form, 'errorM': errorM})
 
 
 
-def FileRead(t):
+def read_file(file_name):
     #ファイルを読み込む
-    #file_data = open("/home/nanako/nanako.pythonanywhere.com/" + t, "r")
-    file_data = open(t, "r")
+    #file_data = open("/home/nanako/nanako.pythonanywhere.com/" + file_name, "r")
+    file_data = open(file_name, "r")
     firstline = True
-    #読み込んだファイルを1行ずつ表示
-    exit = []
+    data = []
     for line in file_data:
-        data = line.split(' ')#空白文字で区切る
-        userval = str(data[0])#データベースに入れる値
-        dbval = int(data[1])#ユーザーが見る値
-        exit.append([dbval, userval])#出口
-    #開いたファイルを閉じる
+        line_each = line.split(' ')
+        data.append(line_each)
     file_data.close()
-    return(exit)
+    return(data)
 
-
-"""
-改札場合わけのためのファイル読み込み
-startrout.txtを読み込む
-"""
-def GateFileRead():
-    #ファイルを読み込む
-    #file_data = open("/home/nanako/nanako.pythonanywhere.com/startroute.txt", "r")
-    file_data = open("startroute.txt", "r")
-    firstline = True
-    #読み込んだファイルを1行ずつ表示
-    StationSize = []
-    for line in file_data:
-        data = line.split(' ')#空白文字で区切る
-        station = int(data[0])#駅のノード
-        gate = int(data[1])#改札のノード
-        dis = int(data[2])#駅から改札までの距離
-        StationSize.append([station, gate, dis])#各駅の改札までの距離情報
-    #開いたファイルを閉じる
-    file_data.close()
-    return(StationSize)
 
 
 """
@@ -82,35 +66,42 @@ def GateFileRead():
 """
 def point(meet_node):
     #ファイルを読み込む
-    #file_data = open("/home/nanako/nanako.pythonanywhere.com/point.txt", "r")
-    file_data = open("point.txt", "r")
-    firstline = True
-    #読み込んだファイルを1行ずつ表示
-    MeetToPoint = []
-    for line in file_data:
-        data = line.split(' ')#空白文字で区切る
-        meet = int(data[0])#駅のノード
-        point = int(data[1])#改札のノード
-        MeetToPoint.append([meet,point])#各駅の改札までの距離情報
-    #開いたファイルを閉じる
-    file_data.close()
+    MeetToPoint = read_file("point.txt")
     #pの初期値
     p = []
     #meetの情報をpointに変換
-    for case in meet_node:
-        c = []
-        for m in case:
-            pp = -1
-            for item in MeetToPoint:
-                if item[0] == m: #待ち合わせポイントがある時
-                    pp = item[1]#待ち合わせ場所
-            if pp == -1: #待ち合わせポイントがない時
-                c.append(m)
-            else:
-                c.append(pp)
-        p.append(c) #ケース別で格納
+    c = []
+    for m in meet_node:
+        pp = -1
+        for item in MeetToPoint:
+            if int(item[0]) == m: #待ち合わせポイントがある時
+                pp = int(item[1])#待ち合わせ場所
+        if pp == -1: #待ち合わせポイントがない時
+            c.append(m)
+        else:
+            c.append(pp)
+    p.append(c) #ケース別で格納
     #値を返す
     return p
+
+
+"""
+ 改札番号を改札名に変更
+"""
+def name(kaisatu):
+    #改札一覧のファイルを配列に変換する
+    KaisatuName = read_file("kaisatu.txt")
+
+    #kaisatuを名前に変換
+    Kname = []
+    for node in kaisatu:
+        for item in KaisatuName:
+            if int(item[0]) == node:
+                k = item[1]
+                Kname.append([k])
+    print(Kname)
+    return(Kname)
+
 
 """
  重複しているものを消去する
@@ -135,49 +126,75 @@ def map(request, pk):
     dest = False #目的地の有無
     mark = 0 #ランドマークor出口のノード番号
     meet = [-100, -100, -100]
+    join = []
+    one = []
+    kaisatuname = []
+    routebox = []
+    sort_routbox = []
+    params = {}
 
-    rn = []
+    #路線が同じ人数を計算
+    rn = np.zeros(12)
     for r in routes:
-        rn.append(r.route)
+        rn[r.route] = rn[r.route] +1
+
+    print("rn: "+str(rn))
+    for index in range(len(rn)):
+        if rn[index]!=0:
+            routebox.extend([[int(rn[index]),index]])
+    print("routebox: "+str(routebox))
+    sort_routebox=sorted(routebox, key=lambda x:x[0], reverse=True)
+    print("sort_routebox2: "+str(sort_routebox))
 
     route = []
-    Routemarks = FileRead("route.txt")
+    all_routes = read_file("route.txt")
+    for r in all_routes:
+        for n in range(len(sort_routebox)):
+            if sort_routebox[n][1] == int(r[1]):
+                print("ok!")
+                route.extend([[r[0],sort_routebox[n][0]]])
 
-    for land in Routemarks:
-        for i in rn:
-            if i == land[0]:
-                route.append(land[1])
-
-    print(route)
     landmark = "なし"
     if group.destination:
         dest = True
         if group.landmark != -1:
             mark = group.landmark
-            Landmarks = FileRead("landmark.txt")
+            Landmarks = read_file("landmark.txt")
             for land in Landmarks:
-                if mark == land[0]:
-                    landmark = land[1]
+                if mark == int(land[1]):
+                    landmark = land[0]
         else:
             mark = group.exitmark
-            Exitmarks = FileRead("exit.txt")
-            for land in Exitmarks:
-                if mark == land[0]:
-                    landmark = land[1]
+            Exitmarks = read_file("exit.txt")
+            for ext in Exitmarks:
+                if mark == int(ext[1]):
+                    landmark = ext[0]
 
     p = []#使用する駅
     for r in routes:
         p.append(r.route)
-    print(p)
 
+    route_gate = []
     if length == group.people:
-        meet, kaisatu = Run(p, mark, dest) #待ち合わせの最適解
-        print(meet)
+        meet, kaisatu, one = Run(p, mark, dest) #待ち合わせの最適解
+        kaisatuname = name(kaisatu)
+        for n in range(len(route)):
+            route_gate.extend([[route[n],kaisatuname[n]]])
         meet2 = point(meet)
         finalmeet = checker(meet2) #最終的に返す目的地の配列
         print("point利用"+str(finalmeet))
         meet = finalmeet
-    return render(request, 'blog/map.html', {'landmark': landmark,'route': route, 'group': group, 'routes': routes, 'meet': meet, 'length': length,})
+    params = {
+        'landmark': landmark,
+        'route': route,
+        'group': group,
+        'routes': routes,
+        'meet': meet,
+        'route_gate': route_gate,
+        'length': length,
+        'pathList_near': one,
+    }
+    return render(request, 'blog/map.html', params)
 
 
 
@@ -185,14 +202,28 @@ def map(request, pk):
 mapページ内の追加ボタンを押した時
 """
 def add_route(request, pk):
+    errorM = "路線を選択してください"
     group = get_object_or_404(Group, pk=pk)
     if request.method == "POST":
         form = RouteForm(request.POST)
         if form.is_valid():
             route = form.save(commit="False")
+            if route.route==-1:
+                form = RouteForm()
+                return render(request, 'blog/add_route.html', {'form': form, 'errorM': errorM})
             route.number = pk
             route.save()
             return redirect('map', pk=route.number)
+        else:
+            form = RouteForm()
+            return render(request, 'blog/add_route.html', {'form': form, 'errorM': errorM})
     else:
         form = RouteForm()
-    return render(request, 'blog/add_route.html', {'form': form})
+        return render(request, 'blog/add_route.html', {'form': form, 'errorM': errorM})
+
+
+
+
+def edit_route(request, pk):
+    print(pk)
+    return render(request, 'blog/index.html')
