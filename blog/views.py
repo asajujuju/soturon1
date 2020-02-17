@@ -60,7 +60,6 @@ def read_file(file_name):
     return(data)
 
 
-
 """
 最適解を待ち合わせポイントに変換
 """
